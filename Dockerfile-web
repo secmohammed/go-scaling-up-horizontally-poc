@@ -5,5 +5,5 @@ COPY web /web
 ENV GOPATH /
 ENV DATA_SERVICE_URL http://172.18.0:4000
 EXPOSE 3000
-RUN go install github.com/ps/web
+RUN go install github.com/secmohammed/web
 ENTRYPOINT ["./bin/web"]

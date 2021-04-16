@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/ps/entity"
+	"github.com/secmohammed/scaling-up-horizontally-poc/api/entity"
 )
 
 func main() {
