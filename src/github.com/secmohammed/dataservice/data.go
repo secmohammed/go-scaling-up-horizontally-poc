@@ -3,7 +3,7 @@ package main
 import (
 	"time"
 
-	"github.com/secmohammed/scaling-up-horizontally-poc/api/entity"
+	"github.com/secmohammed/entity"
 )
 
 var (

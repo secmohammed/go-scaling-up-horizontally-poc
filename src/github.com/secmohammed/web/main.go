@@ -9,7 +9,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/secmohammed/scaling-up-horizontally-poc/api/web/controller"
+	"github.com/secmohammed/util"
+	"github.com/secmohammed/web/controller"
 )
 
 func main() {
@@ -18,7 +19,7 @@ func main() {
 	templateCache, _ := buildTemplateCache()
 	controller.Setup(templateCache)
 
-	go http.ListenAndServe(":3000", nil)
+	go http.ListenAndServe(":3000", new(util.GzipHandler))
 
 	go func() {
 		for range time.Tick(300 * time.Millisecond) {

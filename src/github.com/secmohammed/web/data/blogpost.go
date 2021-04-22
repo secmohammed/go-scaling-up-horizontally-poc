@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/secmohammed/scaling-up-horizontally-poc/api/entity"
+	"github.com/secmohammed/entity"
 )
 
 type BlogPostRepository interface {

@@ -1,8 +1,8 @@
 package model
 
 import (
-	"github.com/secmohammed/scaling-up-horizontally-poc/api/entity"
-	"github.com/secmohammed/scaling-up-horizontally-poc/api/web/data"
+	"github.com/secmohammed/entity"
+	"github.com/secmohammed/web/data"
 )
 
 var (

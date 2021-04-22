@@ -2,18 +2,21 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"regexp"
 	"strconv"
 
-	"github.com/secmohammed/scaling-up-horizontally-poc/api/entity"
+	"github.com/secmohammed/entity"
+	"github.com/secmohammed/util"
 )
 
 func main() {
 	http.HandleFunc("/posts/", HandleRequest)
 	http.HandleFunc("/posts", HandleRequest)
 
-	http.ListenAndServe(":4000", nil)
+	http.ListenAndServe(":4000", new(util.GzipHandler))
+    fmt.Println("Server Started successfully!")
 }
 
 var (

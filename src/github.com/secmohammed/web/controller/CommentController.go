@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/secmohammed/scaling-up-horizontally-poc/api/entity"
-	"github.com/secmohammed/scaling-up-horizontally-poc/api/web/model"
+	"github.com/secmohammed/entity"
+	"github.com/secmohammed/web/model"
 )
 
 type CommentController struct{}
