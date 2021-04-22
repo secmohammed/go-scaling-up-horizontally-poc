@@ -17,6 +17,38 @@ var (
 func processRequests() {
     for {
         select {
+        case <-heartbeatCh:
+            println("hearbeat")
+            server := appservers[:]
+            go func(servers []string) {
+                for _, server := range servers {
+                    resp, err := http.Get("https://" + server + "/ping")
+                    if err != nil || resp.StatusCode != 200 {
+                        unregisterCh <- server
+                    }
+                }
+            }(servers)
+        case host := <-unregisterCh:
+            fmt.Println("unregister " + host)
+            for i := len(appservers) - 1; i >= 0; i-- {
+                if appservers[i] == host {
+                    appservers = append(appservers[:i], appservers[i+1:]...)
+                }
+            }
+        case host := <-registerCh:
+            fmt.Println("register " + host)
+            isFound := false
+            for _, h := range appservers {
+                if h == host {
+                    isFound = true
+                    break
+                }
+            }
+            if !isFound {
+                appservers = append(appservers, host)
+            }
+
+
         case request := <-requestCh:
             fmt.Println("request")
             if len(appservers) == 0 {
