@@ -1,3 +1,3 @@
-module github.com/secmohammed/scaling-up-horizontally-poc
+module github.com/secmohammed/go-scaling-up-horizontally-poc
 
 go 1.16
