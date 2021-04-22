@@ -3,6 +3,6 @@ RUN apt-get update && apt-get install -y --force-yes golang
 COPY api /api
 ENV GOPATH /
 EXPOSE 4000
-RUN go install github.com/secmohammed/go-scaling-up-horizontally-poc/api/dataservice
+RUN go install github.com/secmohammed/scaling-up-horizontally-poc/api/dataservice
 WORKDIR /
 ENTRYPOINT ["./bin/dataservice"]
