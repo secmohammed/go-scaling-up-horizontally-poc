@@ -9,6 +9,8 @@ import (
     "sort"
     "sync"
     "time"
+
+    "github.com/secmohammed/entity"
 )
 
 var mutex sync.Mutex

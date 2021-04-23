@@ -9,18 +9,22 @@ import (
 	"os"
 	"time"
 
+	"github.com/secmohammed/entity"
+	"github.com/secmohammed/logservice/loghelper"
 	"github.com/secmohammed/util"
 	"github.com/secmohammed/web/controller"
 )
+
 var loadbalancerURL = flag.String("loadbalancer", "https://172.18.0.12:2001", "Address of the load balancer")
+
 func main() {
 	flag.Parse()
 
 	templateCache, _ := buildTemplateCache()
 	controller.Setup(templateCache)
-    http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
-        w.WriteHeader(http.StatusOK)
-    })
+	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
 	go http.ListenAndServeTLS(":3000", "cert.pem", "key.pem", new(util.GzipHandler))
 
 	go func() {
@@ -31,12 +35,25 @@ func main() {
 			}
 		}
 	}()
-    // Ideally we should listen for the server up through a channel and then send a request to the loadbalancer for registering.
-    time.Sleep(1 * time.Second)
-    http.Get(*loadbalancerURL + "/register/?port=3000")
+	// Ideally we should listen for the server up through a channel and then send a request to the loadbalancer for registering.
+	time.Sleep(1 * time.Second)
+	go loghelper.WriteEntry(&entity.LogEntry{
+		Level:     entity.LogLeveLInfo,
+		Timestamp: time.Now(),
+		Source:    "app server",
+		Message:   "Registering with loadbalancer",
+	})
+	http.Get(*loadbalancerURL + "/register/?port=3000")
 	log.Println("Server started, press <ENTER> to exit")
 	fmt.Scanln()
-    http.Get(*loadbalancerURL + "/unregister?port=3000")
+	go loghelper.WriteEntry(&entity.LogEntry{
+		Level:     entity.LogLeveLInfo,
+		Timestamp: time.Now(),
+		Source:    "app server",
+		Message:   "Unregistering with loadbalancer",
+	})
+
+	http.Get(*loadbalancerURL + "/unregister?port=3000")
 }
 
 var lastModTime time.Time = time.Unix(0, 0)

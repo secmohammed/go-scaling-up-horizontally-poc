@@ -5,6 +5,10 @@ import (
     "io"
     "net/http"
     "net/url"
+    "time"
+
+    "github.com/secmohammed/entity"
+    "github.com/secmohammed/logservice/loghelper"
 )
 
 var (
@@ -30,6 +34,13 @@ func processRequests() {
             }(servers)
         case host := <-unregisterCh:
             fmt.Println("unregister " + host)
+            go loghelper.WriteEntry(&entity.LogEntry{
+                Level:     entity.LogLeveLInfo,
+                Timestamp: time.Now(),
+                Source:    "load balancer",
+                Message:   "Unregistering application server with address: " + host,
+            })
+
             for i := len(appservers) - 1; i >= 0; i-- {
                 if appservers[i] == host {
                     appservers = append(appservers[:i], appservers[i+1:]...)
@@ -37,6 +48,13 @@ func processRequests() {
             }
         case host := <-registerCh:
             fmt.Println("register " + host)
+            go loghelper.WriteEntry(&entity.LogEntry{
+                Level:     entity.LogLeveLInfo,
+                Timestamp: time.Now(),
+                Source:    "load balancer",
+                Message:   "Registering application server with address: " + host,
+            })
+
             isFound := false
             for _, h := range appservers {
                 if h == host {
