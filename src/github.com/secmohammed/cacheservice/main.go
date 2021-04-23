@@ -41,7 +41,7 @@ func saveToCache(w http.ResponseWriter, r *http.Request) {
     defer mutex.Unlock()
     key := r.URL.Query().Get("key")
     cacheHeader := r.Header.Get("cache-control")
-    fmr.Printf("saving cache entry with key '%s' for %s seconds \n", key, cacheHeader)
+    fmt.Printf("saving cache entry with key '%s' for %s seconds \n", key, cacheHeader)
     matches := maxAgeRexexp.FindStringSubmatch(cacheHeader)
     if len(matches) == 2 {
         dur, _ := strconv.Atoi(matches[1])
@@ -78,7 +78,7 @@ func main() {
             saveToCache(w, r)
         }
     })
-    http.HandleFunc("/invalidate", invlidateEntry)
+    http.HandleFunc("/invalidate", invalidateEntry)
     go http.ListenAndServeTLS(":5000", "cert.pem", "key.pem", nil)
     go purgeCache()
     log.Println("caching service started, press <ENTER> to exit")

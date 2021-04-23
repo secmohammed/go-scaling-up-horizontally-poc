@@ -1,16 +1,16 @@
 package main
 
 import (
-	"fmt"
-	"io"
-	"net/http"
-	"net/url"
+    "fmt"
+    "io"
+    "net/http"
+    "net/url"
 )
 
 var (
-    appservers = []string{}
+    appservers   = []string{}
     currentIndex = 0
-    client = http.Client{Transport: &transport}
+    client       = http.Client{Transport: &transport}
 )
 
 // The idea behind this basic loadbalancer is to distribute the requests equally on the servers registered.
@@ -19,7 +19,7 @@ func processRequests() {
         select {
         case <-heartbeatCh:
             println("hearbeat")
-            server := appservers[:]
+            servers := appservers[:]
             go func(servers []string) {
                 for _, server := range servers {
                     resp, err := http.Get("https://" + server + "/ping")
@@ -47,7 +47,6 @@ func processRequests() {
             if !isFound {
                 appservers = append(appservers, host)
             }
-
 
         case request := <-requestCh:
             fmt.Println("request")

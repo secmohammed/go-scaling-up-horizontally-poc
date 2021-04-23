@@ -54,6 +54,8 @@ func (c *BlogPostController) showBlogList(w http.ResponseWriter, r *http.Request
 
 func (c *BlogPostController) showBlogPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "text/html")
+	cacheKey := url.QueryEscape(r.URL.RequestURI())
+
 	resp, ok := getFromCache(cacheKey)
 	if ok {
 		io.Copy(w, resp)
