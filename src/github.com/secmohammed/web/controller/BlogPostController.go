@@ -1,8 +1,11 @@
 package controller
 
 import (
+	"bytes"
 	"html/template"
+	"io"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -17,7 +20,13 @@ type BlogPostController struct {
 
 func (c *BlogPostController) showBlogList(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "text/html")
-
+	cacheKey := url.QueryEscape(r.URL.RequestURI())
+	resp, ok := getFromCache(cacheKey)
+	if ok {
+		io.Copy(w, resp)
+		resp.Close()
+		return
+	}
 	posts, err := model.GetLastPosts(3)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -36,12 +45,21 @@ func (c *BlogPostController) showBlogList(w http.ResponseWriter, r *http.Request
 		"posts":  posts,
 		"titles": titles,
 	}
-
-	c.blogListTemplate.Execute(w, context)
+	buf := bytes.Buffer{}
+	c.blogListTemplate.Execute(&buf, context)
+	data := buf.Bytes()
+	w.Write(data)
+	go saveToCache(cacheKey, int64(24*time.Hour), data[:])
 }
 
 func (c *BlogPostController) showBlogPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "text/html")
+	resp, ok := getFromCache(cacheKey)
+	if ok {
+		io.Copy(w, resp)
+		resp.Close()
+		return
+	}
 
 	matches := postPath.FindStringSubmatch(r.URL.Path)
 
@@ -69,7 +87,11 @@ func (c *BlogPostController) showBlogPost(w http.ResponseWriter, r *http.Request
 		"titles": titles,
 	}
 
-	c.blogTemplate.Execute(w, context)
+	buf := bytes.Buffer{}
+	c.blogTemplate.Execute(&buf, context)
+	data := buf.Bytes()
+	w.Write(data)
+	go saveToCache(cacheKey, int64(24*time.Hour), data[:])
 }
 
 func (c *BlogPostController) createBlogPost(w http.ResponseWriter, r *http.Request) {
@@ -129,4 +151,5 @@ func (c *BlogPostController) updateBlogPost(w http.ResponseWriter, r *http.Reque
 
 	w.Header().Add("Location", "/posts/"+strconv.Itoa(post.ID))
 	w.WriteHeader(http.StatusSeeOther)
+	go invalidateCacheEntry(url.QueryEscape(r.RequestURI))
 }
